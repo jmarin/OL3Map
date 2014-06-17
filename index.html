@@ -15,19 +15,37 @@
     <h2>Cloudfront Tiles (UjoBaseMap)</h2>
     <div id="map" class="map"></div>
     <script type="text/javascript">
+      var projection = ol.proj.get('EPSG:3857');
+			var projectionExtent = projection.getExtent();
+			var size = ol.extent.getWidth(projectionExtent) / 256;
+			var n = 26;
+			var resolutions = new Array(n);
+			var matrixIds = new Array(n);
+			for (var z = 0; z < n;z++) {
+			  //generate resolutions and matrixIds arrays for this WMTS
+				resolutions[z] = size / Math.pow(2, z);
+				matrixIds[z] = 'EPSG:3857' + z;
+			}
+
       var map = new ol.Map({
         target: 'map',
         layers: [
           new ol.layer.Tile({
 					  source: new ol.source.TileWMS({
 						  url: 'http://d2a1s3wvruq6c0.cloudfront.net/geoserver/wms',
-							params: {'LAYERS': 'UjoBasemap', 'TILED': true},
+							params: {
+							  'LAYERS': 'lightbasemap',
+								'TILED': true,
+								'VERSION': '1.1.1',
+								'TRANSPARENT': false,
+								'CRS': 'EPSG:3857'
+							},
 							serverType: 'geoserver'
 						})				
 					})
         ],
         view: new ol.View2D({
-          center: ol.proj.transform([-77.0, 39.0], 'EPSG:4326', 'EPSG:900913'),
+          center: ol.proj.transform([-77.0, 39.0], 'EPSG:4326', 'EPSG:3857'),
           zoom: 4
         })
       });
